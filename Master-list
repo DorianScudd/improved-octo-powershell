@@ -1,0 +1,76 @@
+#### Master list of powershell code to use. By Dorian Scudder ####
+#### DO NOT RUN ALL AT ONCE ####
+
+### Connect to Security & Compliance Center ###
+$UserCredential = Get-Credential
+
+# note different URI for Security & Compliance Center
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://ps.compliance.protection.outlook.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
+
+# If you want to connect to Security & Compliance Center PowerShell in the same window as an active Exchange Online PowerShell connection,
+# you need to add the Prefix parameter and value (for example, -Prefix "CC") to the end of this command to prevent cmdlet name collisions
+ (both environments share some cmdlets with the same names). That's this statement below
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://ps.compliance.protection.outlook.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection -Prefix "CC"
+
+Import-PSSession $Session -DisableNameChecking
+
+# Disconnect Session
+Remove-PSSession $Session
+
+### Connect to Exchange Online PowerShell Module ###
+$UserCredential = Get-Credential
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
+Import-PSSession $Session -DisableNameChecking
+
+# Disconnect Session
+Remove-PSSession $Session
+
+#Start-ManagedFolderAssistant will not run automatically on mailboxes < 10mb. you cannot force a run on larger mailboxes,
+# command will not be enforced. runs at maximum every seven days. Usually throttled anyway on larger mailboxes.
+Start-ManagedFolderAssistant <MailboxName>
+
+## Mailbox info (folders, item count, etc)
+Get-MailboxFolderStatistics -identity <name> -FolderScope <inbox, calendar, RecoverableItems, etc> | Select-Object name, FolderPath, FolderType, ContainerClass, StorageQuota, VisibleItemsInFolder, HiddenItemsInFolder, FolderSize, ItemsInFolderAndSubfolders, DeletePolicy, ArchivePolicy| ogv
+
+## Get Calendar info
+# In Exchange Online, we recommend that you don't use the Search-Mailbox -DeleteContent command to delete
+ messages in mailboxes that have auto-expanding archiving enabled. Unexpected data loss may occur.
+
+## Search Mailbox
+Search-Mailbox -Identity "<identity>" -SearchQuery kind:meetings -EstimateResultOnly
+# Keyword Query Language (KQL) info: https://docs.microsoft.com/exchange/security-and-compliance/in-place-ediscovery/message-properties-and-search-operators
+
+# Mailbox Info
+Get-Mailbox -Identity "<identity>"
+
+### AD Info ###
+
+Get-ADGroupMember -Identity <AD Group Name> | Where-Object {$_.samaccountname -like '<samAccountName*'}
+
+#Add-ADGroupMember -Identity <AD Group Name> -Members <UserName> -credential $UserCredential -confirm
+
+#Get-ADGroupMember -Identity <AD Group Name> | Where-Object {$_.samAccountName -lk '<samAccountName>*'}
+
+### Object Properties ###
+# Get object information
+$date | Get-Member
+##get all properties in object
+$date | Select-Object -Property *
+
+### Azure Active Directory Sync ###
+# Best practice: run from server AAD is on
+
+Import-Module ADSync
+
+##Delta Sync
+Start-ADSyncSyncCycle -PolicyType Delta
+
+##Full Sync
+Start-ADSyncSyncCycle -PolicyType Initial
+
+# Get find out which groups a mail contact is a member of
+$emailContacts = get-contact | Where-Object {$_.WindowsEmailAddress -like '*cognizant.com*'}
+foreach ($email in $emailContacts)
+{		
+    get-distributiongroup | where-object {$_.primarysmtpaddress -eq $email}
+}
