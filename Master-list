@@ -7,9 +7,9 @@ $UserCredential = Get-Credential
 # note different URI for Security & Compliance Center
 $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://ps.compliance.protection.outlook.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
 
-# If you want to connect to Security & Compliance Center PowerShell in the same window as an active Exchange Online PowerShell connection,
-# you need to add the Prefix parameter and value (for example, -Prefix "CC") to the end of this command to prevent cmdlet name collisions
- (both environments share some cmdlets with the same names). That's this statement below
+# If you want to connect to Security & Compliance Center PowerShell in the same window as an active Exchange Online PowerShell
+#connection, you need to add the Prefix parameter and value (for example, -Prefix "CC") to the end of this command to prevent 
+#cmdlet name collisions (both environments share some cmdlets with the same names). That's this statement below
 $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://ps.compliance.protection.outlook.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection -Prefix "CC"
 
 Import-PSSession $Session -DisableNameChecking
@@ -74,3 +74,24 @@ foreach ($email in $emailContacts)
 {		
     get-distributiongroup | where-object {$_.primarysmtpaddress -eq $email}
 }
+
+##Open Azure Active Directory Module for PowerShell on DC with module installed
+##Connect and enter credentials. You may need to add authentication sites to safe sites. verify site address before adding
+#Connect-MsolService
+
+##Get ObjectRoleID for Tenant Admin role
+
+#$AdminRoleObjectId = Get-MsolRole | Where {$_.name -eq "Company Administrator" } | select-object -property ObjectId
+
+## View "Company Administrators" (roleobject id for rolename "Company Administrator" is <removed>)
+Get-MSolRoleMember -roleobjectid $AdminRoleObjectId
+
+## Remove svc_ShareGate_Admin account from tenant admin role
+Remove-MsolRoleMember -RoleObjectId $AdminRoleObjectID -RoleMemberType User -RoleMemberEmailAddress "<email@domain>"
+
+## Add svc_ShareGate_Admin back to tenant admin role
+Add-MsolRoleMember RoleObjectId = $AdminRole.ObjectId -RoleMemberEmailAddress "<email@domain>"
+
+	#*** OR ***
+
+	Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberEmailAddress "<email@domain>"
