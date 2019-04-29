@@ -69,7 +69,7 @@ Start-ADSyncSyncCycle -PolicyType Delta
 Start-ADSyncSyncCycle -PolicyType Initial
 
 # Get find out which groups a mail contact is a member of
-$emailContacts = get-contact | Where-Object {$_.WindowsEmailAddress -like '*cognizant.com*'}
+$emailContacts = get-contact | Where-Object {$_.WindowsEmailAddress -like '*<domain>.com*'}
 foreach ($email in $emailContacts)
 {		
     get-distributiongroup | where-object {$_.primarysmtpaddress -eq $email}
