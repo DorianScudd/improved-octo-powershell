@@ -95,3 +95,42 @@ Add-MsolRoleMember RoleObjectId = $AdminRole.ObjectId -RoleMemberEmailAddress "<
 	#*** OR ***
 
 	Add-MsolRoleMember -RoleName "Company Administrator" -RoleMemberEmailAddress "<email@domain>"
+	
+##Remove aliases from emails
+set-mailbox "<name>" -emailaddresses @{remove="email1[at][domain.com","email2[at]domain.com"}
+
+##Create distribution list
+#New-DistributionGroup -DisplayName "<Display Name>" -ManagedBy managedby@domain.com -MemberDepartRestriction Closed -MemberJoinRestriction Closed -Members "member1@domain.com","member2@domain.com","member3@domain.com" -Name <name> -PrimarySmtpAddress email[at]domain.com -Type "Distribution"
+
+##Add distributiongroup member
+#add-distributiongroupmember -identity "Lane Valente" -member member[at]domain.com
+
+##Add-BulkUsers. import AD module first
+
+$Users = Import-Csv  "C:\filesource\\userlist.csv"
+
+$domain = "@domain[dot]com"
+#for each line/user in collection users (csv) get parameters needed for aduser command
+ForEach ($User in $Users)
+{            
+    $Displayname = $User.Lastname  + "," + $User.Firstname
+    $UserFirstname = $User.'Firstname'            
+    $UserLastname = $User.'Lastname' 
+    $SAM = $User.SAM
+    $UPN = $User.FirstName + "." + $User.LastName + $domain
+    $OU = $User.OU  
+    $Password = $User.Password | ConvertTo-SecureString -AsPlainText -Force
+    $Description = $User.Description 
+    $Manager = $User.Manager
+    $Server = $User.DC
+               
+    New-ADUser -Name "$Displayname" -DisplayName "$Displayname" -SamAccountName $SAM -UserPrincipalName $UPN -GivenName "$UserFirstname" -Surname "$UserLastname" -Description "$Description" -Manager $Manager -AccountPassword $Password -Enabled $true -Path "$OU" -ChangePasswordAtLogon $false –PasswordNeverExpires $true #-server $Server
+}
+
+##list of all vendors in vendor OU. remember to import AD module
+#enter ou where vendors are
+$vendorOU = "<vendor ou>" #identity of vendor OU
+#get distinguished name of vendor OU
+$distinguishedName = Get-ADObject -Filter 'ObjectClass -eq "organizationalUnit" -and name -eq $vendorOU'| Select-Object -Property DistinguishedName
+#get users in OU
+get-aduser -Filter * -SearchBase $distinguishedName.DistinguishedName -Properties sAMAccountName, Company, CN, Enabled | ft sAMAccountName, Company, Enabled
