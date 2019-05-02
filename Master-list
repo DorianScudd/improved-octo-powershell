@@ -134,3 +134,6 @@ $vendorOU = "<vendor ou>" #identity of vendor OU
 $distinguishedName = Get-ADObject -Filter 'ObjectClass -eq "organizationalUnit" -and name -eq $vendorOU'| Select-Object -Property DistinguishedName
 #get users in OU
 get-aduser -Filter * -SearchBase $distinguishedName.DistinguishedName -Properties sAMAccountName, Company, CN, Enabled | ft sAMAccountName, Company, Enabled
+
+##focused inbox at mailbox level
+get-FocusedInbox -identity <upn>
