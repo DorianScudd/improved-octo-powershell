@@ -146,7 +146,7 @@ Add-MailboxPermission -Identity <identity> -AccessRights FullAccess -User <email
 Add-RecipientPermission -Identity <identity> -AccessRights SendAs -Trustee <email of person getting sendas permission>
 
 ##Office365 Group management
-Get-UnifiedGroup -Identity <email identity> | Select-Object *
+Get-UnifiedGroup -Identity <email identity> | Select-Object * /#field "EmailAddresses" stores aliases
 
 #Get messagetrace detail info
 $messageinfo = Get-MessageTrace -RecipientAddress <address> -SenderAddress <address> -StartDate 04/25/2019 -EndDate 05/03/2019 | select-object messageid, messagetraceid
