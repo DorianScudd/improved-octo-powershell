@@ -140,3 +140,7 @@ get-FocusedInbox -identity <upn>
 
 ##Format table info
 get-mailboxpermission -identity <identity> | ft -autosize
+
+##Add delegates with full or send as permissions to mailbox or shared mailbox
+Add-MailboxPermission -Identity <identity> -AccessRights FullAccess -User <email of person getting full access> -InheritanceType all
+Add-RecipientPermission -Identity <identity> -AccessRights SendAs -Trustee <email of person getting sendas permission>
