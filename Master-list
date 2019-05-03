@@ -137,3 +137,6 @@ get-aduser -Filter * -SearchBase $distinguishedName.DistinguishedName -Propertie
 
 ##focused inbox at mailbox level
 get-FocusedInbox -identity <upn>
+
+##Format table info
+get-mailboxpermission -identity <identity> | ft -autosize
