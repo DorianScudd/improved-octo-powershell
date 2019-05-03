@@ -86,10 +86,10 @@ foreach ($email in $emailContacts)
 ## View "Company Administrators" (roleobject id for rolename "Company Administrator" is <removed>)
 Get-MSolRoleMember -roleobjectid $AdminRoleObjectId
 
-## Remove svc_ShareGate_Admin account from tenant admin role
+## Remove Admin account from tenant admin role
 Remove-MsolRoleMember -RoleObjectId $AdminRoleObjectID -RoleMemberType User -RoleMemberEmailAddress "<email@domain>"
 
-## Add svc_ShareGate_Admin back to tenant admin role
+## Add Admin back to tenant admin role
 Add-MsolRoleMember RoleObjectId = $AdminRole.ObjectId -RoleMemberEmailAddress "<email@domain>"
 
 	#*** OR ***
@@ -103,7 +103,7 @@ set-mailbox "<name>" -emailaddresses @{remove="email1[at][domain.com","email2[at
 #New-DistributionGroup -DisplayName "<Display Name>" -ManagedBy managedby@domain.com -MemberDepartRestriction Closed -MemberJoinRestriction Closed -Members "member1@domain.com","member2@domain.com","member3@domain.com" -Name <name> -PrimarySmtpAddress email[at]domain.com -Type "Distribution"
 
 ##Add distributiongroup member
-#add-distributiongroupmember -identity "Lane Valente" -member member[at]domain.com
+#add-distributiongroupmember -identity "<identity>" -member member[at]domain.com
 
 ##Add-BulkUsers. import AD module first
 
