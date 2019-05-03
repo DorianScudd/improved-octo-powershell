@@ -144,3 +144,15 @@ get-mailboxpermission -identity <identity> | ft -autosize
 ##Add delegates with full or send as permissions to mailbox or shared mailbox
 Add-MailboxPermission -Identity <identity> -AccessRights FullAccess -User <email of person getting full access> -InheritanceType all
 Add-RecipientPermission -Identity <identity> -AccessRights SendAs -Trustee <email of person getting sendas permission>
+
+##Office365 Group management
+Get-UnifiedGroup -Identity <email identity> | Select-Object *
+
+#Get messagetrace detail info
+$messageinfo = Get-MessageTrace -RecipientAddress <address> -SenderAddress <address> -StartDate 04/25/2019 -EndDate 05/03/2019 | select-object messageid, messagetraceid
+
+#i grab the messageid in $messageinfo in case i need it for something else. otherwise, just select messagetraceid
+get-messagetracedetail -MessageTraceId $messageinfo.MessageTraceId -RecipientAddress <address>
+
+
+
