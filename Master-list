@@ -25,6 +25,15 @@ Import-PSSession $Session -DisableNameChecking
 # Disconnect Session
 Remove-PSSession $Session
 
+##Connect to SharePoint Online Module
+$adminUPN="<admin cred>"
+$orgName="<tenantname>"
+$userCredential = Get-Credential -UserName $adminUPN -Message "Type the password."
+Connect-SPOService -Url https://$orgName-admin.sharepoint.com -Credential $userCredential
+
+##Disconnect sharepoint online module (only 1 session per tenant, two consecutive connects, disconnects previous session
+Disconnect-SPOService
+
 #Start-ManagedFolderAssistant will not run automatically on mailboxes < 10mb. you cannot force a run on larger mailboxes,
 # command will not be enforced. runs at maximum every seven days. Usually throttled anyway on larger mailboxes.
 Start-ManagedFolderAssistant <MailboxName>
