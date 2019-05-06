@@ -157,5 +157,9 @@ $messageinfo = Get-MessageTrace -RecipientAddress <address> -SenderAddress <addr
 #i grab the messageid in $messageinfo in case i need it for something else. otherwise, just select messagetraceid
 get-messagetracedetail -MessageTraceId $messageinfo.MessageTraceId -RecipientAddress <address>
 
+##start mail trace for > 10 days.
+Start-HistoricalSearch -EndDate 05/02/2019 -StartDate 04/02/2019 -ReportTitle "<Name of Report>" -ReportType MessageTrace -RecipientAddress <recipientemail> -NotifyAddress <email of person to be notified>
 
+##get list of recent historical search mail traces. gives jobID status, rows, and any error info.
+Get-HistoricalSearch  | ft -AutoSize 
 
