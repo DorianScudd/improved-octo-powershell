@@ -100,7 +100,10 @@ Add-MsolRoleMember RoleObjectId = $AdminRole.ObjectId -RoleMemberEmailAddress "<
 set-mailbox "<name>" -emailaddresses @{remove="email1[at][domain.com","email2[at]domain.com"}
 
 ##Create distribution list
-#New-DistributionGroup -DisplayName "<Display Name>" -ManagedBy managedby@domain.com -MemberDepartRestriction Closed -MemberJoinRestriction Closed -Members "member1@domain.com","member2@domain.com","member3@domain.com" -Name <name> -PrimarySmtpAddress email[at]domain.com -Type "Distribution"
+New-DistributionGroup -DisplayName "<Display Name>" -ManagedBy managedby@domain.com -MemberDepartRestriction Closed -MemberJoinRestriction Closed -Members "member1@domain.com","member2@domain.com","member3@domain.com" -Name <name> -PrimarySmtpAddress email[at]domain.com -Type "Distribution"
+
+##Grant sendAs permission
+Add-RecipientPermission <Identity> -AccessRights SendAs -Trustee <Identity>
 
 ##Add distributiongroup member
 #add-distributiongroupmember -identity "<identity>" -member member[at]domain.com
