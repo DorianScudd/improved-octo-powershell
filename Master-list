@@ -172,3 +172,13 @@ Start-HistoricalSearch -EndDate 05/02/2019 -StartDate 04/02/2019 -ReportTitle "<
 ##get list of recent historical search mail traces. gives jobID status, rows, and any error info.
 Get-HistoricalSearch  | ft -AutoSize 
 
+##get members of groups 
+$grpOfDistros = Get-ADGroup -Filter 'name -like "<name starts with>*"' | Select-Object name
+foreach ($item in $grpOfDistros)
+{
+	#new line after group and after list of members
+    $grpMembers = Get-ADGroupMember -Identity $item.name  | Select-Object user, samaccountname
+    write-host "Group: " $item.name `n
+    Write-Host "Members: " $grpMembers.samAccountName `n
+}
+
