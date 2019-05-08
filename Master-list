@@ -185,3 +185,8 @@ foreach ($item in $grpOfDistros)
     Write-Host "Members: " $grpMembers.samAccountName `n
 }
 
+##Enable ActiveSync Exchange Logging. Runs up to 48hrs on exhange online, runs up to 72 hrs on exchange server
+Set-CASMailbox <alias> -ActiveSyncDebugLogging:$true
+##Retrieve logs
+Get-MobileDeviceStatistics -Mailbox alias -GetMailboxLog:$true -NotificationEmailAddresses "<notificationEmail>"
+
