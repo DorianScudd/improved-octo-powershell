@@ -201,3 +201,9 @@ foreach ($item in $rolegroups)
 }
 # would like to get this piped version to work properly
 Get-RoleGroup | Select name | foreach-object {"$_.name `n"; Get-RoleGroupMember -Identity $_.name}
+
+##Group Policy Export
+Import-Module GroupPolicy
+Get-GPOReport -All -ReportType HTML -Path c:\Users\<user>\desktop\GPOExport.html
+#win 10 and win sever 2016 PowerShell
+#https://docs.microsoft.com/en-us/powershell/module/grouppolicy/?view=win10-ps
