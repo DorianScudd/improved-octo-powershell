@@ -190,3 +190,12 @@ Set-CASMailbox <alias> -ActiveSyncDebugLogging:$true
 ##Retrieve logs
 Get-MobileDeviceStatistics -Mailbox alias -GetMailboxLog:$true -NotificationEmailAddresses "<notificationEmail>"
 
+##get security and compliance roles and their members. connect w/ to security and compliance module first
+$rolegroups = Get-RoleGroup | Select name
+
+foreach ($item in $rolegroups)
+{
+    $item.Name
+    Get-RoleGroupMember -Identity $item.name | Select-Object name
+    write-host `n
+}
