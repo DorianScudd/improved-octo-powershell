@@ -199,3 +199,5 @@ foreach ($item in $rolegroups)
     Get-RoleGroupMember -Identity $item.name | Select-Object name
     write-host `n
 }
+# would like to get this piped version to work properly
+Get-RoleGroup | Select name | foreach-object {"$_.name `n"; Get-RoleGroupMember -Identity $_.name}
