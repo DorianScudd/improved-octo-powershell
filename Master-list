@@ -34,7 +34,7 @@ Connect-SPOService -Url https://$orgName-admin.sharepoint.com -Credential $userC
 ##Disconnect sharepoint online module (only 1 session per tenant, two consecutive connects, disconnects previous session
 Disconnect-SPOService
 
-##Get membership of AD user
+##Get membership of AD user. remember run-as if complete membership not shown
 Get-ADPrincipalGroupMembership username | select name
 
 #Start-ManagedFolderAssistant will not run automatically on mailboxes < 10mb. you cannot force a run on larger mailboxes,
