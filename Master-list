@@ -207,3 +207,8 @@ Import-Module GroupPolicy
 Get-GPOReport -All -ReportType HTML -Path c:\Users\<user>\desktop\GPOExport.html
 #win 10 and win sever 2016 PowerShell
 #https://docs.microsoft.com/en-us/powershell/module/grouppolicy/?view=win10-ps
+
+##"Copy" distro grp members". import activedirectory module first
+$sourceGroup = "<source>"
+$targetGroup = "<target>"
+Get-ADGroupMember -Identity $sourceGroup |foreach { Add-ADGroupMember -Identity $targetGroup -Members $($_.DistinguishedName) }
