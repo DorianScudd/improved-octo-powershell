@@ -91,7 +91,10 @@ foreach ($email in $emailContacts)
 ##Connect and enter credentials. You may need to add authentication sites to safe sites. verify site address before adding
 #Connect-MsolService
 
-##Get ObjectRoleID for Tenant Admin role
+## change UPN user principal name
+Set-MsolUserPrincipalName -UserPrincipalName <name@tenant.onmicrosoft.com -NewUserPrincipalName name@tenant.com
+
+##Get ObjectRoleID for Tenant Adminrole
 
 #$AdminRoleObjectId = Get-MsolRole | Where {$_.name -eq "Company Administrator" } | select-object -property ObjectId
 
