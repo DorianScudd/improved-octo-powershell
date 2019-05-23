@@ -1,0 +1,19 @@
+##Goal to house proper functions for server configuration steps Windows Server 2016
+
+##Adjust firewall profile settings based critera
+$firewallProfile = Get-NetFirewallProfile | Select-Object -property name, enabled
+foreach ($item in $firewallProfile)
+{
+    if ($item.Enabled -eq "False" -and $item.Name -ne "Domain")
+    {
+        Write-Host $item.name "disabled ("$item.Enabled") and not domain (" $item.name")"
+
+    }
+    else
+    {
+     write-host "Warning: Profile " $item.name " is " $item.Enabled ". Unexpected if Profile is not Domain."
+    }
+    
+}
+
+Set-NetFirewallProfile -Name $item.name -Enabled = True | Where-Object {$_.Name -ne "Domain" -and ($_.Name -eq "Private" -or $_.Name -eq "Public")}
