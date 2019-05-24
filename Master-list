@@ -2,7 +2,7 @@
 #### DO NOT RUN ALL AT ONCE ####
 
 ### Connect to Security & Compliance Center ###
-$UserCredential = Get-Credential
+$UserCredential = Get-Credential -credential <email>
 
 # note different URI for Security & Compliance Center
 $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://ps.compliance.protection.outlook.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
@@ -30,6 +30,8 @@ $adminUPN="<admin cred>"
 $orgName="<tenantname>"
 $userCredential = Get-Credential -UserName $adminUPN -Message "Type the password."
 Connect-SPOService -Url https://$orgName-admin.sharepoint.com -Credential $userCredential
+
+##
 
 ##Disconnect sharepoint online module (only 1 session per tenant, two consecutive connects, disconnects previous session
 Disconnect-SPOService
@@ -89,7 +91,9 @@ foreach ($email in $emailContacts)
 
 ##Open Azure Active Directory Module for PowerShell on DC with module installed
 ##Connect and enter credentials. You may need to add authentication sites to safe sites. verify site address before adding
-#Connect-MsolService
+$UserCredential = Get-Credential -credential <admin email>
+Import-Module MSOnline
+Connect-MsolService -Credential $UserCredential
 
 ## change UPN user principal name
 Set-MsolUserPrincipalName -UserPrincipalName <name@tenant.onmicrosoft.com -NewUserPrincipalName name@tenant.com
