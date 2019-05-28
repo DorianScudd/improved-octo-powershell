@@ -219,3 +219,12 @@ Get-GPOReport -All -ReportType HTML -Path c:\Users\<user>\desktop\GPOExport.html
 $sourceGroup = "<source>"
 $targetGroup = "<target>"
 Get-ADGroupMember -Identity $sourceGroup |foreach { Add-ADGroupMember -Identity $targetGroup -Members $($_.DistinguishedName) }
+
+
+##DFSR report. DFS replication report.
+$path = "<enter path>"
+if (!(test-path -Path $path))
+{
+    New-Item -ItemType Directory -Path $path -Value "healthreports"
+}
+$groupName = Get-DfsReplicationGroup | Select-Object -Property GroupName | % -Process {write-dfsrhealthreport -groupname $_.GroupName -Path $path}
