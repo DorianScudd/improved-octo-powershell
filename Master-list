@@ -228,3 +228,16 @@ if (!(test-path -Path $path))
     New-Item -ItemType Directory -Path $path -Value "healthreports"
 }
 $groupName = Get-DfsReplicationGroup | Select-Object -Property GroupName | % -Process {write-dfsrhealthreport -groupname $_.GroupName -Path $path}
+
+##List of Possible ADObject attributes
+## Ian Farr https://blogs.technet.microsoft.com/poshchap/2017/09/22/one-liner-query-the-ad-schema-for-user-object-attributes/
+Get-ADObject -SearchBase (Get-ADRootDSE).SchemaNamingContext -Filter {name -like "User"} -Properties MayContain,SystemMayContain |
+Select-Object @{n="Attributes";e={$_.maycontain + $_.systemmaycontain}} | 
+Select-Object -ExpandProperty Attributes |
+Sort-Object
+
+##List of constructed attributes
+##Ian Farr https://blogs.technet.microsoft.com/poshchap/2017/09/22/one-liner-query-the-ad-schema-for-user-object-attributes/
+Get-ADObject -SearchBase (Get-ADRootDSE).SchemaNamingContext -ldapfilter '(systemFlags:1.2.840.113556.1.4.803:=4)' -Properties systemFlags |
+Select-Object Name |
+Sort-Object Name
