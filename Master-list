@@ -215,6 +215,9 @@ Get-GPOReport -All -ReportType HTML -Path c:\Users\<user>\desktop\GPOExport.html
 #win 10 and win sever 2016 PowerShell
 #https://docs.microsoft.com/en-us/powershell/module/grouppolicy/?view=win10-ps
 
+##Backup all GPO Policies
+Backup-GPO -All -Path <Path to save policy folders to>
+
 ##"Copy" distro grp members". import activedirectory module first
 $sourceGroup = "<source>"
 $targetGroup = "<target>"
