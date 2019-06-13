@@ -247,3 +247,18 @@ Sort-Object
 Get-ADObject -SearchBase (Get-ADRootDSE).SchemaNamingContext -ldapfilter '(systemFlags:1.2.840.113556.1.4.803:=4)' -Properties systemFlags |
 Select-Object Name |
 Sort-Object Name
+
+##Account Lockout Search
+##Ian Farr https://blogs.technet.microsoft.com/poshchap/2014/05/16/tracing-the-source-of-account-lockouts/
+
+#Obtain user
+
+$User = Read-Host -Prompt "Please enter a user name"
+
+#Specify PDCe
+
+$PDC = Get-ADDomainController -Discover -Service PrimaryDC
+
+#Collect lockout events for user from last hour
+
+Get-WinEvent -ComputerName $PDC.Name -Logname Security -FilterXPath "*[System[EventID=4740 and TimeCreated[timediff(@SystemTime) <= 3600000]] and EventData[Data[@Name='TargetUserName']='$User']]" | Select-Object TimeCreated,@{Name='User Name';Expression={$_.Properties[0].Value}},@{Name='Source Host';Expression={$_.Properties[1].Value}}
