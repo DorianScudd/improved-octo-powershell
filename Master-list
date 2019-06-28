@@ -93,7 +93,7 @@ foreach ($email in $emailContacts)
 ##Connect and enter credentials. You may need to add authentication sites to safe sites. verify site address before adding
 $UserCredential = Get-Credential -credential <admin email>
 Import-Module MSOnline
-Connect-MsolService -Credential $UserCredential
+Connect-MsolService #-Credential $UserCredential # leave out credential parameter if you are using MultiFactor Authentication
 
 ## change UPN user principal name
 Set-MsolUserPrincipalName -UserPrincipalName <name@tenant.onmicrosoft.com -NewUserPrincipalName name@tenant.com
