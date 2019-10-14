@@ -271,3 +271,9 @@ $x = foreach ($item in $activeEmployeeList)
 {
     Get-User $item.userprincipalname | Where-Object {$_.RecipientType -eq 'UserMailbox'} | Select-Object name,userprincipalname
 }
+
+#Content in MB of OneDrive Usage
+$TenantUrl = "https://hercrentals-admin.sharepoint.com"
+$CSVFile = [Environment]::GetFolderPath("Desktop") + "\OneDriveSites.csv"
+Connect-SPOService -Url $TenantUrl
+Get-SPOSite -IncludePersonalSite $true -Limit all -Filter "Url -like '-my.sharepoint.com/personal/'" | select storageusagecurrent,url,owner,title,status,lastcontentmodifieddate | export-csv -path $CSVFile -notypeinformation
