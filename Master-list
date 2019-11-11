@@ -277,3 +277,49 @@ $TenantUrl = "https://hercrentals-admin.sharepoint.com"
 $CSVFile = [Environment]::GetFolderPath("Desktop") + "\OneDriveSites $(get-date -f yyyy-MM-dd).csv"
 Connect-SPOService -Url $TenantUrl
 Get-SPOSite -IncludePersonalSite $true -Limit all -Filter "Url -like '-my.sharepoint.com/personal/'" | select storageusagecurrent,url,owner,title,status,lastcontentmodifieddate | export-csv -path $CSVFile -notypeinformation
+
+# return members of large distro lists
+# https://www.petri.com/enumerating-members-of-large-active-directory-groups
+
+Function Get-MyLargeGroup2 {
+[cmdletbinding()]
+Param(
+[Parameter(Position=0,ValueFromPipeline,ValueFromPipelineByPropertyName)]
+[ValidateNotNullorEmpty()]
+[string]$Name,
+[string[]]$Properties = @("SamAccountname","Title","Description","Department")
+)
+ 
+Begin {
+    Write-Verbose "Starting $($MyInvocation.MyCommand)"
+    #add default properties
+    $Properties += "ObjectClass"
+    $Properties += "Name"
+    $Properties += "DistinguishedName"
+ 
+    Write-verbose "retrieving these user properties"
+    Write-Verbose ( $Properties -join "," | Out-String)
+} #begin
+ 
+Process {
+Write-Verbose "Retrieving members from $Name"
+$mygroup = Get-ADGroup -Identity $Name -Properties Members
+ 
+foreach ($member in $mygroup.members) {
+  $object = $member | Get-ADObject -Properties $properties
+  if ($object.ObjectClass -eq 'Group') {
+    Write-Verbose "Found nested group $($object.distinguishedname)"
+    #recursively run this command for the nested group
+    & $MyInvocation.MyCommand -name $object.Name
+  } 
+  elseif ($object.objectclass -eq 'User') {
+    Select-Object -InputObject $object -property $Properties
+  }
+} #foreach
+} #process
+ 
+End {
+    Write-Verbose "Ending $($MyInvocation.MyCommand)"
+} #end
+ 
+} #end function
