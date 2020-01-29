@@ -1,6 +1,20 @@
 #### Master list of powershell code to use. By Dorian Scudder ####
 #### DO NOT RUN ALL AT ONCE ####
 
+### Multi-Faction Authentication
+# Connect to Exchange Online Protection and Security & Compliance Center
+Connect-IPPSSession -UserPrincipalName <UPN>
+
+#Connect to Exchange Online Service
+Connect-EXOPSSession -UserPrincipalName <your UPN>
+
+# Disconnect
+Get-PSSession | Remove-PSSession
+
+# Disconnect
+Get-PSSession | Remove-PSSession
+
+
 ### Connect to Security & Compliance Center ###
 $UserCredential = Get-Credential -credential <email>
 
