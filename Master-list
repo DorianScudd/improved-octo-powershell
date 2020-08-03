@@ -337,3 +337,47 @@ End {
 } #end
  
 } #end function
+
+#####################################################
+
+<#
+.Synopsis
+   Creates an inbox redirect rule for more than one mailbox user
+.DESCRIPTION
+   Creates an inbox redirect rule for more than one mailbox user. Supply path to mailbox users, rule name, redirect address and exceptions.
+.EXAMPLE
+   New-InboxRuleForGroup -PathToInboxRuleUsers c:\temp\userlist.csv -RedirectTo redir@[rediraddress].com -InboxRuleName "Redirect Rule Name"
+.EXAMPLE
+   Another example of how to use this cmdlet
+#>
+function New-InboxRuleForGroup
+{
+    [CmdletBinding()]
+    [OutputType([int])]
+    Param
+    (
+        # Path to csv that has list of users that will get the inbox rule applied to. csv header is "Email".
+        [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0)]
+        $PathToInboxRuleUsers,
+
+        # Email address to redirect mail to
+        [string]
+        $RedirectTo,
+
+        # Name of Inbox Rule as it shoud appear in User's mailbox rule section
+        [string]
+        $InboxRuleName
+    )
+
+    $UsersToModify = Import-Csv -Path $pathToInboxRuleUsers
+    $exceptionList = "[comma-separated list of email addresses]"
+
+    foreach ($item in $UsersToModify)
+    {
+        $email = $item.Email
+    
+        New-InboxRule -Mailbox $email -Name $InboxRuleName -RedirectTo $redirectTo -ExceptIfFrom $exceptionList -ExceptIfMessageTypeMatches Calendaring
+    }
+}
