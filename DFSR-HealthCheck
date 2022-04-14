@@ -1,0 +1,80 @@
+#this script gets replication backlog between two servers.
+
+#sending dfs member in read-only DFS configuration.
+$sourceServer = "[sendingmember]"
+#receiving members in read-only DFS configuration.
+$destinationServer = @("[receivingmember1]","[receivingmember2]")
+
+#servers to perform DFS state code check on.
+$serversForStateCode = @("[sendingmember]","[receivingmember1]","[receivingmember2]")
+
+#gets DFSR backlog of receiving members.
+function Get-DFSRDorBacklog ($sourceComputer, $destinationComputer)
+{
+    #get replication groups. Skips MDTRepl replication group (MDT replication group).
+    $replicationgroups = Get-DfsReplicationGroup -GroupName * | ? {$_.groupname -notlike '*mdt*'}
+
+    #custom object to store value.
+    $myObject = [PSCustomobject]@{
+        Name = ''
+        Backlog = ''
+    }
+
+    #iterate through replication groups and get backlog
+    foreach ($item in $replicationgroups)
+    {
+        $mfoldername = Get-DfsReplicatedFolder -GroupName $item.GroupName
+        $mbacklog = (Get-DfsrBacklog -GroupName $item.GroupName -FolderName $mfoldername.FolderName  -SourceComputerName $sourcecomputer -DestinationComputerName $destinationcomputer -Verbose 4>&1).Message.Split(':')[2]
+
+        #set number zero where no backlog
+        if ($mbacklog.length -eq 0)
+        {
+            $myObject.Backlog = 0
+        }
+        else
+        {
+            $myObject.Backlog = $mbacklog
+        }
+
+        $myObject.Name = $item.GroupName
+    
+    
+        Write-Host $destinationcomputer $myObject.Name ": " $myObject.Backlog
+    }
+}
+
+function Get-DorDFSHealth ($sendingMember,$receivingMembers,$stateCodeServersToCheck)
+{
+	#check for connectivity
+	if(!(Test-DorDFSRConnection($stateCodeServersToCheck))
+	{
+		write-host "Unable to ping one of the DFSR members."
+	}
+	else
+	{
+		write-host "Members Online..." -ForeGroundColor Yellow
+		#get backlog of read-only members of DFSR
+		foreach ($item in $receivingMembers)
+		{
+			Get-DFSRDorBacklog -sourceComputer $sendingMember -destinationComputer $item
+		}  
+
+		#get DFS statecodes for all members of replication grouip (4 is normal)
+		foreach ($item in $stateCodeServersToCheck)
+		{
+			gwmi -Namespace "root\microsoftdfs" -Class DfsrReplicatedFolderInfo -ComputerName $item | select -Property  PSComputerName,state,ReplicatedFolderName,ReplicationGroupName,ReplicatedFolderGuid|ft
+		}
+	}
+	
+	
+}
+
+function Test-DorDFSRConnection ($ComputerList)
+{
+	foreach ($item in $ComputerLIst)
+	{
+		Test-Connection -ComputerName $item -Count 1
+	}
+}
+
+Get-DorDFSHealth -sendingMember $sourceServer -receivingMembers $destinationServer -stateCodeServersToCheck $serversForStateCode
