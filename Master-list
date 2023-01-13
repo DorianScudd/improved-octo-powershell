@@ -381,3 +381,30 @@ function New-InboxRuleForGroup
         New-InboxRule -Mailbox $email -Name $InboxRuleName -RedirectTo $redirectTo -ExceptIfFrom $exceptionList -ExceptIfMessageTypeMatches Calendaring
     }
 }
+
+##o365 license swap
+
+Connect-MgGraph -Scopes "User.Read.All", "Group.ReadWrite.All"
+
+$oldm365audioconf = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'MCOMEETADV'
+$newm365audioconf = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'Microsoft_Teams_Audio_Conferencing_select_dial_out'
+$newE3Sku = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'SPE_E3'
+$oldE3Sku = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'ENTERPRISEPACK'
+
+
+$e3swap = import-csv -path $env:USERPROFILE"\downloads\oe3_lic_rem.csv"
+
+foreach ($item in $e3swap)
+{
+	Set-MgUserLicense -UserId $item.userprincipalname -AddLicenses @{SkuId = $newE3Sku.SkuId} -RemoveLicenses @($oldE3Sku.SkuId)
+}
+
+#conference swap
+
+$aud_lic_swap = import-csv -path $env:USERPROFILE"\downloads\aud_lic_rem.csv"
+foreach ($item in $aud_lic_swap)
+{
+	Set-MgUserLicense -UserId $item.userprincipalname -AddLicenses @{SkuId = $newm365audioconf.SkuId} -RemoveLicenses @($oldm365audioconf.SkuID)
+}
+
+disconnect-mggraph
